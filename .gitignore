@@ -1,0 +1,10 @@
+package-lock.json
+node_modules/
+
+__pycache__
+.venv/
+.env
+*.db
+problems.txt
+wiki_words
+databases/
