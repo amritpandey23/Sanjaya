@@ -17,7 +17,7 @@ class VectorDatabase:
                     f"Database with the name {db_name} does not exist. Please pass embedding size to initialize a new database."
                 )
         self._db_name = db_name
-        self._embedding_size = embedding_size if embedding_size is not None else 250
+        self._embedding_size = embedding_size if embedding_size is not None else 512
         self._embedding_table_name = "text_embeddings"
         self._db_path = os.path.join(DATABASE_DIR, self._db_name)
         self._db = self.__make_connection()

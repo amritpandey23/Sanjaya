@@ -6,6 +6,9 @@ from gemini import get_completion
 
 from database_wrappers import VectorDatabase, SampleDatabase
 
+DATABASE = "new.db"
+EMBED_SIZE = 512
+
 
 app = Flask(__name__)
 
@@ -35,6 +38,7 @@ def generate_embeddings():
 
     try:
         embeddings = text_to_embeddings(text, model)
+        # print(len(embeddings))
         return jsonify({"embeddings": embeddings.tolist()})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -55,7 +59,7 @@ def store_embeddings():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-    db = VectorDatabase("final.db", 250)
+    db = VectorDatabase(DATABASE, EMBED_SIZE)
 
     try:
         db.insert_embeddings(text=text, vector=embeddings)
@@ -115,7 +119,7 @@ def text_embeddings():
     data = request.get_json()
     text = data.get("text", "")
     k = data.get("k", 2)
-    db_name = data.get("db_name", "final.db")
+    db_name = data.get("db_name", DATABASE)
 
     if not text:
         return jsonify({"message": "please specify text"}), 400
@@ -136,7 +140,7 @@ def text_embeddings():
 def ask():
     data = request.get_json()
     question = data.get("question", "")
-    db_name = data.get("db_name", "final.db")
+    db_name = data.get("db_name", DATABASE)
 
     if not question:
         return jsonify({"message": "please specify question"}), 400
@@ -154,7 +158,7 @@ def ask():
     except Exception as e:
         return jsonify({"error": e}), 500
 
-    print(content)
+    # print(content)
 
     answer = get_completion(content=content, question=question)
 
@@ -163,7 +167,7 @@ def ask():
 
 @app.route("/text/all", methods=["GET"])
 def get_all_text_samples():
-    db_path = "databases/final.db"
+    db_path = f"databases/{DATABASE}"
     sample_db = SampleDatabase(db_path)
 
     try:
@@ -175,6 +179,6 @@ def get_all_text_samples():
 
 
 if __name__ == "__main__":
-    model_path = "./wiki_words"
+    model_path = "./universal_sentence_encoder"
     model = load_model(model_path)
     app.run(debug=True)
